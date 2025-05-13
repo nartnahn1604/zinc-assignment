@@ -34,11 +34,13 @@ RUN apt-get update \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
+# Create a non-root user
+RUN useradd -m appuser
+
 # Create static directory and set permissions before switching user
 RUN mkdir -p /app/static && chown -R appuser:appuser /app
 
-# Create a non-root user and switch to it
-RUN useradd -m appuser
+# Switch to non-root user
 USER appuser
 
 # Copy project files
