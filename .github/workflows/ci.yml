@@ -33,7 +33,7 @@ jobs:
       - name: Run migrations
         run: |
           docker run --rm --network host \
-            -e MYSQL_HOST=localhost \
+            -e MYSQL_HOST=127.0.0.1 \
             -e MYSQL_DATABASE=zincdb \
             -e MYSQL_USER=zincuser \
             -e MYSQL_PASSWORD=zincpass \
@@ -44,7 +44,7 @@ jobs:
       - name: Run unit tests
         run: |
           docker run --rm --network host \
-            -e MYSQL_HOST=localhost \
+            -e MYSQL_HOST=127.0.0.1 \
             -e MYSQL_DATABASE=zincdb \
             -e MYSQL_USER=zincuser \
             -e MYSQL_PASSWORD=zincpass \
