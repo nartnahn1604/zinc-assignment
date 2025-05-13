@@ -1,0 +1,44 @@
+version: '3.3'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: mysql_db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: zincdb
+      MYSQL_USER: zincuser
+      MYSQL_PASSWORD: zincpass
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./init-grants.sql:/docker-entrypoint-initdb.d/init-grants.sql:ro
+    command: --default-authentication-plugin=mysql_native_password
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-p${MYSQL_ROOT_PASSWORD}" ]
+      interval: 1s
+      timeout: 5s
+      retries: 5
+
+  django:
+    build: .
+    container_name: django_app
+    command: sh -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env.dev
+    depends_on:
+      - mysql
+    healthcheck:
+      test: [ "CMD", "sh", "-c", "python manage.py showmigrations --plan | grep '\\[X\\]' || exit 1 && curl -f http://localhost:8000/health" ]
+      interval: 2s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  mysql_data:

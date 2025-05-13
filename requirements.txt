@@ -1,0 +1,9 @@
+asgiref==3.8.1
+Django==5.2.1
+djangorestframework==3.16.0
+mysqlclient==2.2.7
+sqlparse==0.5.3
+python-dotenv
+pandas
+python-json-logger
+pydantic
