@@ -1,9 +1,9 @@
 # Use official Python image
-FROM python:3.12-slim as builder
+FROM python:3.12-slim AS builder
 
 # Set environment variables
-ENV PYTHONDONTWRITEBYTECODE 1
-ENV PYTHONUNBUFFERED 1
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
 
 # Set work directory
 WORKDIR /app
@@ -34,15 +34,15 @@ RUN apt-get update \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
+# Create static directory and set permissions before switching user
+RUN mkdir -p /app/static && chown -R appuser:appuser /app
+
 # Create a non-root user and switch to it
 RUN useradd -m appuser
 USER appuser
 
 # Copy project files
 COPY --chown=appuser:appuser . /app/
-
-# Collect static files (optional, for admin)
-RUN mkdir -p /app/static
 
 # Expose port 8000
 EXPOSE 8000
