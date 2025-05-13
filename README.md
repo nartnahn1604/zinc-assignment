@@ -8,6 +8,25 @@
 
 ---
 
+### 0. Create the .env.dev File
+
+Before building the Docker images, create a `.env.dev` file in the project root with the following content:
+
+```
+DJANGO_SECRET_KEY=your-secret-key
+DJANGO_DEBUG=True
+MYSQL_DATABASE=zincdb
+MYSQL_USER=zincuser
+MYSQL_PASSWORD=zincpass
+MYSQL_HOST=mysql
+MYSQL_PORT=3306
+MYSQL_TEST_DATABASE=zinctestdb
+```
+
+Adjust the values as needed for your environment.
+
+---
+
 ### 1. Build the Docker Images
 
 From the project root directory:
