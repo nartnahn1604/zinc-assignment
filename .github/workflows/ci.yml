@@ -20,8 +20,6 @@ jobs:
           - 3306:3306
         options: >-
           --health-cmd="mysqladmin ping -h localhost -p$MYSQL_ROOT_PASSWORD" --health-interval=10s --health-timeout=5s --health-retries=5
-        volumes:
-          - ./init-grants.sql:/docker-entrypoint-initdb.d
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -36,18 +34,22 @@ jobs:
         run: |
           docker run --rm --network host \
             -e MYSQL_HOST=127.0.0.1 \
-            -e MYSQL_DATABASE=test_zincdb \
+            -e MYSQL_DATABASE=zincdb \
             -e MYSQL_USER=zincuser \
             -e MYSQL_PASSWORD=zincpass \
             -e DJANGO_SECRET_KEY=dev-secret-key \
             -e DJANGO_DEBUG=True \
             zinc-django python manage.py migrate
-
+      - name: Install MySQL client
+        run: sudo apt-get update && sudo apt-get install -y mysql-client
+      - name: Run grant script
+        run: |
+          mysql -h 127.0.0.1 -P 3306 -u root -prootpassword -e "GRANT ALL PRIVILEGES ON *.* TO 'zincuser'@'%' WITH GRANT OPTION;"
       - name: Run unit tests
         run: |
           docker run --rm --network host \
             -e MYSQL_HOST=127.0.0.1 \
-            -e MYSQL_DATABASE=test_zincdb \
+            -e MYSQL_DATABASE=zincdb \
             -e MYSQL_USER=zincuser \
             -e MYSQL_PASSWORD=zincpass \
             -e DJANGO_SECRET_KEY=dev-secret-key \
