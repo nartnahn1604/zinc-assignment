@@ -1,0 +1,56 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: rootpassword
+          MYSQL_DATABASE: zincdb
+          MYSQL_USER: zincuser
+          MYSQL_PASSWORD: zincpass
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h localhost -p$MYSQL_ROOT_PASSWORD" \
+          --health-interval=10s \
+          --health-timeout=5s \
+          --health-retries=5
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker image
+        run: docker build -t zinc-django .
+
+      - name: Run migrations
+        run: |
+          docker run --rm --network host \
+            -e MYSQL_HOST=localhost \
+            -e MYSQL_DATABASE=zincdb \
+            -e MYSQL_USER=zincuser \
+            -e MYSQL_PASSWORD=zincpass \
+            -e DJANGO_SECRET_KEY=dev-secret-key \
+            -e DJANGO_DEBUG=True \
+            zinc-django python manage.py migrate
+
+      - name: Run unit tests
+        run: |
+          docker run --rm --network host \
+            -e MYSQL_HOST=localhost \
+            -e MYSQL_DATABASE=zincdb \
+            -e MYSQL_USER=zincuser \
+            -e MYSQL_PASSWORD=zincpass \
+            -e DJANGO_SECRET_KEY=dev-secret-key \
+            -e DJANGO_DEBUG=True \
+            zinc-django python manage.py test 
