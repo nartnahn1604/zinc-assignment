@@ -50,7 +50,7 @@
 
 ## 6. Observability & SRE
 - **Logging**: All API and system logs in JSON for easy parsing and aggregation.
-- **Health Endpoints**: `/api/health/` for liveness/readiness.
+- **Health Endpoints**: `/health` for liveness/readiness.
 - **Metrics**: API exposes revenue metrics; can be extended for Prometheus.
 - **Alerting**: Integrate with log/metric aggregation tools (e.g., ELK, Grafana, Sentry).
 
